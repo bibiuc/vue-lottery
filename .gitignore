@@ -6,3 +6,4 @@ error.json
 server/config.js
 *.xlsx
 yarn.lock
+package-lock.json
