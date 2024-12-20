@@ -1,27 +1,17 @@
 const express = require("express");
 const opn = require("opn");
 const bodyParser = require("body-parser");
-const path = require("path");
-const chokidar = require("chokidar");
 const cfg = require("./config");
 const database = require("./database")
-const knex = database.knex
 
 const {
-  loadXML,
-  loadTempData,
-  writeXML,
-  saveDataFile,
-  shuffle
+  writeXML
 } = require("./help");
 
 let app = express(),
   router = express.Router(),
   cwd = process.cwd(),
-  dataBath = __dirname,
   port = 8090,
-  luckyData = {},
-  defaultType = cfg.prizes[0]["type"],
   defaultPage = `default data`;
 
 //这里指定参数使用 json 格式
@@ -122,11 +112,11 @@ router.post("/saveData", async (req, res, next) => {
 
 // 保存数据到excel中去
 router.post("/export", async (req, res, next) => {
-  let outData = [["昵称", "手机号"]];
+  let outData = [["奖项", "昵称", "手机号"]];
   const luckyUsers = await database.getLuckyUsers();
   cfg.prizes.forEach(item => {
     outData.push([item.text]);
-    outData = outData.concat(luckyUsers.filter((user) => user.prize_id == item.type) || []);
+    outData = outData.concat(luckyUsers.filter((user) => user.prize_id == item.type).map((user) => [item.text, user.nickname, user.mobile]) || []);
   });
 
   writeXML(outData, "/抽奖结果.xlsx")

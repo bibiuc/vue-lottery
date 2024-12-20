@@ -1,14 +1,8 @@
 const cfg = require('./config')
 const Knex = require('knex')
-const knex = require('knex')({
+const knex = Knex({
   client: 'mysql2',
-  connection: {
-    host: '192.168.10.8',
-    port: 3306,
-    user: 'root',
-    password: 'aa123123',
-    database: 'shanghui'
-  }
+  connection: cfg.database
 });
 
 const select = (filter) => {
