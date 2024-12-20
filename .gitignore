@@ -5,3 +5,4 @@ temp.json
 error.json
 server/config.js
 *.xlsx
+yarn.lock
