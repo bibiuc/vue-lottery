@@ -8,7 +8,7 @@ module.exports = merge(baseConfig, {
     hot: true,
     compress: true,
     port: 9000,
-    open: true,
+    open: false,
     proxy: {
       "*": "http://localhost:18888"
     },
