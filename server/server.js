@@ -65,7 +65,10 @@ router.post("/getTempData", async (req, res, next) => {
     luckyData = {};
   }
   res.json({
-    cfgData: cfg,
+    cfgData: {
+      ...cfg,
+      database: null
+    },
     leftUsers: leftUsers,
     luckyData: luckyData
   });
