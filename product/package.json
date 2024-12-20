@@ -4,7 +4,7 @@
   "description": "抽奖",
   "main": "index.js",
   "scripts": {
-    "start": "cd dist && node ../../server/index.js 8888",
+    "start": "cd dist && node ../../server/index.js 18000",
     "serve": "npm run start",
     "build": "webpack --mode=production --progress --colors",
     "dev": "webpack-dev-server --config webpack.dev.js --mode=development --progress --colors"
