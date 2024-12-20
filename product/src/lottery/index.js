@@ -24,7 +24,6 @@ let TOTAL_CARDS,
   EACH_COUNT,
   ROW_COUNT = 7,
   COLUMN_COUNT = 17,
-  COMPANY,
   HIGHLIGHT_CELL = [],
   // 当前的比例
   Resolution = 1;
@@ -43,12 +42,6 @@ let rotateObj;
 
 let selectedCardIndex = [],
   rotate = false,
-  basicData = {
-    prizes: [], //奖品信息
-    users: [], //所有人员
-    luckyUsers: {}, //已中奖人员
-    leftUsers: [] //未中奖人员
-  },
   interval,
   // 当前抽的奖项，从最低奖开始抽，直到抽到大奖
   currentPrizeIndex,
@@ -69,7 +62,6 @@ function initAll() {
       // 获取基础数据
       prizes = data.cfgData.prizes;
       EACH_COUNT = data.cfgData.EACH_COUNT;
-      COMPANY = data.cfgData.COMPANY;
       HIGHLIGHT_CELL = createHighlight();
       basicData.prizes = prizes;
       setPrizes(prizes);
@@ -101,19 +93,17 @@ function initAll() {
   });
 
   window.AJAX({
-    url: "/getUsers",
-    success(data) {
-      basicData.users = data;
+    url: "/getBasicData",
+    success(basicData) {
 
-      initCards();
-      // startMaoPao();
+      initCards(basicData);
       animate();
-      shineCard();
+      shineCard(basicData);
     }
   });
 }
 
-function initCards() {
+function initCards(basicData) {
   let member = basicData.users.slice(),
     showCards = [],
     length = member.length;
@@ -350,11 +340,11 @@ function createCard(user, isBold, id, showTable) {
       "rgba(0,127,127," + (Math.random() * 0.7 + 0.25) + ")";
   }
   //添加公司标识
-  element.appendChild(createElement("avatar", user.avatar));
+  element.appendChild(createElement("avatar", user ? user.avatar : ''));
 
-  element.appendChild(createElement("name", user.nickname));
+  element.appendChild(createElement("name", user ? user.nickname : ''));
 
-  element.appendChild(createElement("details", user.mobile));
+  element.appendChild(createElement("details", user ? user.mobile : ''));
   return element;
 }
 
@@ -616,11 +606,6 @@ function resetCard(duration = 500) {
  * 抽奖
  */
 function lottery() {
-  // if (isLotting) {
-  //   rotateObj.stop();
-  //   btns.lottery.innerHTML = "开始抽奖";
-  //   return;
-  // }
   btns.lottery.innerHTML = "结束抽奖";
   rotateBall().then(() => {
     // 将之前的记录置空
@@ -712,10 +697,10 @@ function random(num) {
 function changeCard(cardIndex, user) {
   let card = threeDCards[cardIndex].element;
 
-  card.innerHTML =
+  card.innerHTML = user ?
     `<img src="http://sh.rbsoft.cn${user.avatar}" class="avatar"/>
 <div class="name">${user.nickname}</div>
-<div class="details">${user.mobile}</div>`;
+<div class="details">${user.mobile}</div>` : '<div></div>';
 }
 
 /**
@@ -730,7 +715,7 @@ function shine(cardIndex, color) {
 /**
  * 随机切换背景和人员信息
  */
-function shineCard() {
+function shineCard(basicData) {
   let maxCard = 10,
     maxUser;
   let shineCard = 10 + random(maxCard);

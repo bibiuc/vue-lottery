@@ -76,9 +76,7 @@ router.post("/getTempData", async (req, res, next) => {
 
 // 获取所有用户
 router.post("/reset", async (req, res, next) => {
-  const users = await database.getAllUsers();
-  const user_ids = users.map(({id}) => id);
-  await database.saveLuckyUsers(user_ids, 0);
+  await database.resetLuckyUsers();
   log(`重置数据成功`);
   res.json({
     type: "success"
@@ -110,6 +108,30 @@ router.post("/saveData", async (req, res, next) => {
     });
     log(`保存奖品数据失败`);
   }
+});
+router.post('/getBasicData', async (req, res, next) => {
+  const users = await database.getAllUsers();
+  const leftUsers = users.filter(({prize_id}) => prize_id == 0);
+  const luckyUsers = users.filter(({prize_id}) => prize_id != 0);
+  const luckyData = {}
+  const prizes = JSON.parse(JSON.stringify(cfg.prizes))
+  if (luckyUsers && luckyUsers.length) {
+    luckyUsers.reduce((res, item, index) => {
+      res[item.prize_id] = res[item.prize_id] ? res[item.prize_id].concat([item]) : [item]
+      return res;
+    }, luckyData)
+  }
+  prizes.forEach((prize) => {
+    prize.count -= luckyData[prize.type] ? luckyData[prize.type].length : 0
+  })
+
+  res.json({
+    prizes, //奖品信息
+    users: users, //所有人员
+    luckyUsers: luckyData, //已中奖人员
+    leftUsers: leftUsers //未中奖人员
+  })
+  log('获取baseicData成功')
 });
 
 // 保存数据到excel中去

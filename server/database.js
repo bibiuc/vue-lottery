@@ -62,11 +62,22 @@ const saveLuckyUsers = (user_ids, prize_id) => {
     })
 }
 
+const resetLuckyUsers = () => {
+  return knex('fa_wdsxh_activity_apply')
+    .where({
+      activity_id: cfg.activity_id
+    })
+    .update({
+      prize_id: 0
+    })
+}
+
 module.exports = {
   knex,
   getAllUsers,
   getSigninUsers,
   getLuckyUsers,
   getLeftUsers,
-  saveLuckyUsers
+  saveLuckyUsers,
+  resetLuckyUsers
 }
