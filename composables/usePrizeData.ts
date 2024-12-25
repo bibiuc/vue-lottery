@@ -1,0 +1,70 @@
+interface PrizeUser {
+    leftUsers: any[]
+    luckyUsers: any[]
+    allUsers: any[]
+}
+
+interface PrizeData extends PrizeUser{
+    prizes: any[]
+    prize: any
+}
+export const usePrizeData = () => {
+    const data = reactive<PrizeData>({
+        prizes: [],
+        prize: {},
+        leftUsers: [],
+        luckyUsers: [],
+        allUsers: []
+    });
+    const { $fetch } = useFetchModel({
+        onResponseError(e) {
+            const _message = typeof e.response._data === 'object' ? e.response._data.message : e.response._data;
+            const message = typeof _message === 'string' ? _message : '系统异常'
+            ElMessage.error(message)
+        }
+    })
+
+    return {
+        data,
+        actions: {
+            async syncPrizes(id: string) {
+                const res = await $fetch.get('/api/getPrizes', { params: { id } }).catch(() => []);
+                data.prizes = res as any[];
+            },
+            async syncPrize(id: string) {
+                const res = await $fetch.get('/api/getPrize', { params: { id } }).catch(() => []);
+                data.prize = res as any[];
+            },
+            async saveLuckyUsers(id: string) {
+                await $fetch.post('/api/saveLuckyUsers', { body: { id, prize_id: data.prize.id, user_ids: data.luckyUsers.map(({id}) => id) } }).catch(() => []);
+                data.luckyUsers = [];
+            },
+            async syncLeftUsers(id: string) {
+                const res = await $fetch.get('/api/getLeftUsers', { params: { id } }).catch(() => []);
+                data.leftUsers = res as any[];
+            },
+            async syncAllUsers(id: string) {
+                const res = await $fetch.get('/api/getAllUsers', { params: { id } }).catch(() => []);
+                data.allUsers = res as any[];
+            },
+            async lottery(id: string) {
+                try{
+                    const res = await $fetch.get('/api/lottery', { params: { id } })
+                    data.luckyUsers = res as any[];
+                } catch (e) {
+                    data.luckyUsers = [];
+                    throw e
+                }
+            },
+            async reset(id: string) {
+                await $fetch.get('/api/reset', { params: { id } }).catch(() => []);
+            },
+            download(id: string) {
+                const a = document.createElement('a')
+                a.href = '/api/download?id=' + id
+                a.download = '中奖人员.xlsx'
+                a.click()
+            }
+        }
+    }
+}

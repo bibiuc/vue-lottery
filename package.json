@@ -1,0 +1,30 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": ">=0.2.6",
+    "@element-plus/nuxt": "1.1.0",
+    "@tweenjs/tween.js": "^25.0.0",
+    "@vue-api/nuxt": "2.0.8",
+    "@vueuse/core": "^12.2.0",
+    "@vueuse/nuxt": "^12.2.0",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.38.2",
+    "element-plus": ">=2",
+    "lodash": "^4.17.21",
+    "mysql2": "^3.11.5",
+    "node-xlsx": "^0.24.0",
+    "nuxt": "^3.14.1592",
+    "three": "^0.171.0",
+    "vue": "latest",
+    "vue-router": "latest"
+  }
+}
