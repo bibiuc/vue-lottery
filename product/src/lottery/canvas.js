@@ -91,16 +91,10 @@
 
       c.fillRect(pixelX, pixelY, pixelRadius, pixelRadius);
       c.fillStyle = "rgba(209, 255, 255, " + star.o + ")";
-      //c.fill();
+      // c.fill();
     }
   }
 
-  // document.getElementById('warp').addEventListener("click", function(e) {
-  //     window.c.beginPath();
-  //     window.c.clearRect(0, 0, window.canvas.width, window.canvas.height);
-  //     window.warp = warp ? 0 : 1;
-  //     executeFrame();
-  // });
 
   executeFrame();
 })();

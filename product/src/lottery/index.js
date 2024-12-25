@@ -400,25 +400,6 @@ function transform(targets, duration) {
     .start();
 }
 
-// function rotateBall() {
-//   return new Promise((resolve, reject) => {
-//     scene.rotation.y = 0;
-//     new TWEEN.Tween(scene.rotation)
-//       .to(
-//         {
-//           y: Math.PI * 8
-//         },
-//         ROTATE_TIME
-//       )
-//       .onUpdate(render)
-//       .easing(TWEEN.Easing.Exponential.InOut)
-//       .start()
-//       .onComplete(() => {
-//         resolve();
-//       });
-//   });
-// }
-
 function rotateBall() {
   return new Promise((resolve, reject) => {
     scene.rotation.y = 0;
