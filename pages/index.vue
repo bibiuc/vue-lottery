@@ -61,8 +61,9 @@ const saveLuckyUsers = async () => {
 const downloadResult = () => {
   actions.download(id);
 }
-const resetAll = () => {
-  actions.reset(id);
+const resetAll = async () => {
+  await ElMessageBox.confirm('你确定要重新开始抽取所有奖项吗?');
+  await actions.reset(id);
   drawing.value = 0;
   reload()
 }

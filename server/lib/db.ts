@@ -11,6 +11,7 @@ const select = async (wheres: BinaryOperator[]) => {
     if (!result) {
         return []
     }
+    const ids = [];
     return result.map(({fa_wdsxh_activity_apply, fa_wdsxh_user_wechat}) => {
         return {
             id: fa_wdsxh_activity_apply.wechat_id,
@@ -19,6 +20,13 @@ const select = async (wheres: BinaryOperator[]) => {
             avatar: fa_wdsxh_user_wechat.avatar,
             prize_id: fa_wdsxh_activity_apply.prize_id
         }
+    }).filter(({id}) => {
+        const has = ids.includes(id)
+        if (has) {
+            return false
+        }
+        ids.push(id)
+        return true
     })
 }
 
