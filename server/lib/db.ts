@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { drizzle } from "drizzle-orm/mysql2";
-import { ActivityUserTable, MemberTable } from './schema'
+import {ActivityPrizeTable, ActivityUserTable, MemberTable} from './schema'
 import {and, eq, gt, inArray} from "drizzle-orm";
 import type {BinaryOperator} from "drizzle-orm/sql/expressions/conditions";
 
@@ -23,113 +23,8 @@ const select = async (wheres: BinaryOperator[]) => {
 }
 
 export const getPrizes = async (id: string) => {
-    const prizes = [
-        {
-            id: 1,
-            level: 0,
-            name: '特等奖',
-            image: '',
-            description: '',
-            price: '222.00',
-            once: 1,
-            left: 100,
-            max: 100,
-            status: 0,
-            created_at: '2024-03-01'
-        },
-        {
-            id: 2,
-            level: 1,
-            name: '特等奖',
-            image: '/_nuxt/assets/images/secrit.jpg',
-            description: '神秘大礼',
-            price: '222.00',
-            once: 1,
-            left: 1,
-            max: 1,
-            status: 1,
-            created_at: '2024-03-01'
-        },
-        {
-            id: 3,
-            level: 2,
-            name: '一等奖',
-            image: '/_nuxt/assets/images/mbp.jpg',
-            description: 'Mac Pro',
-            price: '222.00',
-            once: 1,
-            left: 1,
-            max: 1,
-            status: 1,
-            created_at: '2024-03-01'
-        },
-        {
-            id: 4,
-            level: 3,
-            name: '二等奖',
-            image: '/_nuxt/assets/images/huawei.png',
-            description: '华为 Mate30',
-            price: '222.00',
-            once: 1,
-            left: 2,
-            max: 2,
-            status: 1,
-            created_at: '2024-03-01'
-        },
-        {
-            id: 5,
-            level: 4,
-            name: '三等奖',
-            image: '/_nuxt/assets/images/ipad.jpg',
-            description: 'Ipad Mini5',
-            price: '222.00',
-            once: 3,
-            left: 3,
-            max: 3,
-            status: 1,
-            created_at: '2024-03-01'
-        },
-        {
-            id: 6,
-            level: 5,
-            name: '四等奖',
-            image: '/_nuxt/assets/images/spark.jpg',
-            description: '大疆无人机',
-            price: '222.00',
-            once: 4,
-            left: 4,
-            max: 4,
-            status: 1,
-            created_at: '2024-03-01'
-        },
-        {
-            id: 7,
-            level: 6,
-            name: '五等奖',
-            image: '/_nuxt/assets/images/kindle.jpg',
-            description: 'Kindle',
-            price: '222.00',
-            once: 5,
-            left: 5,
-            max: 5,
-            status: 1,
-            created_at: '2024-03-01'
-        },
-        {
-            id: 8,
-            level: 7,
-            name: '六等奖',
-            image: '/_nuxt/assets/images/edifier.jpg',
-            description: '漫步者蓝牙耳机',
-            price: '222.00',
-            once: 2,
-            left: 6,
-            max: 6,
-            status: 1,
-            created_at: '2024-03-01'
-        }
-    ];
-
+    const prizes = await db.select().from(ActivityPrizeTable).where(eq(ActivityPrizeTable.activity_id, id));
+    console.log(prizes)
     const luckyUsers = await getLuckyUsers(id);
     return prizes.map((prize) => {
         return {

@@ -2,11 +2,11 @@
   <div class="container" ref="containerRef" >
       <div class="none">
         <div v-for="([y, x, i, highlight, blue], key) in matrix" :key="key" ref="elementsRef">
-          <template v-if="getUser(i, users)">
-            <div class="element"  :class="{lightitem: highlight, highlight: (highlight && !entered)|| (entered && luckyIndexes[getUser(i, users).id] == key)}" :style="highlight && !entered? '': `background-color: rgba(0,127,127,${blue}`">
-                <img class="avatar" :src="'http://sh.rbsoft.cn' + getUser(i, users).avatar" alt="">
-                <div class="name">{{getUser(i, users).nickname}}</div>
-                <div class="details">{{getUser(i, users).mobile}}</div>
+          <template v-if="getters.user(i, users)">
+            <div class="element"  :class="{lightitem: highlight, highlight: (highlight && !entered)|| (entered && luckyIndexes[getters.user(i, users).id] == key)}" :style="highlight && !entered? '': `background-color: rgba(0,127,127,${blue}`">
+                <img class="avatar" :src="getters.avatar(i, users)" alt="">
+                <div class="name">{{getters.user(i, users).nickname}}</div>
+                <div class="details">{{getters.user(i, users).mobile}}</div>
             </div>
           </template>
         </div>
@@ -19,7 +19,11 @@ import * as TWEEN from '@tweenjs/tween.js'
 import {isEqual} from 'lodash'
 import {CSS3DObject, CSS3DRenderer} from 'three/examples/jsm/renderers/CSS3DRenderer'
 import {TrackballControls} from 'three/examples/jsm/controls/TrackballControls.js'
+import {useLuckyIndexes} from "~/composables/useLuckyIndexes";
+import {use3DSurfaces} from "~/composables/use3DSurfaces";
+import {useLuckyTweens} from "~/composables/useLuckyTween";
 
+const {getters} = usePrizeData();
 const props = defineProps({
   luckyUsers: {
     type: Array,
@@ -46,46 +50,27 @@ const containerRef= ref(null)
 const elementsRef = ref(null)
 const luckyIds = computed(() => {
   return [].concat(
-      props.users.filter(({prize_id}) => prize_id > 0).map(({id}) => id),
-      props.luckyUsers.map(({id}) => id),
-  ).sort()
+      props.users.filter(({prize_id}) => prize_id > 0),
+      props.luckyUsers,
+  ).map(({id}) => id).sort()
 })
-const luckyIndexes = ref({});
-const addLuckyIndex = (id, index) => luckyIndexes.value = {...luckyIndexes.value, [id]: index}
-watch(luckyIds, (a, b) => {
-  if (isEqual(a, b)) {
-    return;
-  }
-  luckyIndexes.value = {}
-})
-const { matrix, position, shine } = useMainMatrix(([y, x, i], index) => {
-  const user = getUser(i, props.users)
+const {indexes: luckyIndexes, isInIndexes: isLuckyIndex, current: currentLuckyIndexes} = useLuckyIndexes(luckyIds, () => props.luckyUsers)
+const { matrix, shine } = useMainMatrix(([y, x, i], index) => {
+  const user = getters.user(i, props.users)
   if (!user) {
     return false
   }
-  const savedIndex = luckyIndexes.value[user.id]
-  if (luckyIds.value.includes(user.id)) {
-    if (typeof savedIndex == 'number') {
-      return savedIndex == index
-    }
-    addLuckyIndex(user.id, index)
-    return true
-  }
-  return false
+  return isLuckyIndex(user.id, index)
 });
-const matrixSize = matrix.value.length;
+const {animate, getRotate} = useTweens();
 const Resolution = 1;
 const renderBus = useEventBus<string>('render')
 const switchBus = useEventBus<[boolean, number]>('switch')
 const luckyBus = useEventBus<any[]>('lucky')
 const rotateBus = useEventBus<boolean>('rotate')
-
-const getUser = (i: number, users: any[]) => {
-  if (!users || users.length < 0) {
-    return null
-  }
-  return users[i % users.length]
-}
+const getSurfaceTweens = use3DSurfaces(matrix.value)
+const getSphereTweens = use3DSpheres(matrix.value)
+const getLuckyTweens = useLuckyTweens()
 
 if (!import.meta.env.SSR) {
   onMounted(() => {
@@ -98,7 +83,7 @@ if (!import.meta.env.SSR) {
           1,
           10000
       );
-      camera.position.z = 3000;
+      camera.position.z = 3500;
       const scene = new THREE.Scene();
       const cssObjects = matrix.value.map((_, i) => {
         const object = new CSS3DObject(elements[i])
@@ -108,22 +93,6 @@ if (!import.meta.env.SSR) {
         scene.add(object);
         return object
       });
-      const surfaces = matrix.value.map(([i, j]) => {
-        const object = new THREE.Object3D();
-        object.position.x = j * 140 - position.x;
-        object.position.y = -(i * 180) + position.y;
-        return object
-      })
-      const vector = new THREE.Vector3();
-      const spheres = cssObjects.map((_: any, i: number) => {
-        const phi = Math.acos(-1 + (2 * i) / matrixSize);
-        const theta = Math.sqrt(matrixSize * Math.PI) * phi;
-        const object = new THREE.Object3D();
-        object.position.setFromSphericalCoords(800 * Resolution, phi, theta);
-        vector.copy(object.position).multiplyScalar(2);
-        object.lookAt(vector);
-        return object
-      })
       const renderer = new CSS3DRenderer();
       renderer.setSize(window.innerWidth, window.innerHeight);
       container.appendChild(renderer.domElement);
@@ -141,158 +110,22 @@ if (!import.meta.env.SSR) {
       })
 
       switchBus.on(([v, duration]) => {
-        const targets = v ? spheres : surfaces
-        const ended_at = Date.now() + duration * 2
-        const tweens:TWEEN.Tween[] = [];
-        let tween: TWEEN.Tween;
-        for (let i = 0; i < cssObjects.length; i++) {
-          let object = cssObjects[i];
-          let target = targets[i];
-
-          tween = new TWEEN.Tween(object.position)
-              .to(
-                  {
-                    x: target.position.x,
-                    y: target.position.y,
-                    z: target.position.z
-                  },
-                  Math.random() * duration + duration
-              )
-              .easing(TWEEN.Easing.Exponential.InOut)
-              .start();
-          tweens.push(tween)
-          tween = new TWEEN.Tween(object.rotation)
-              .to(
-                  {
-                    x: target.rotation.x,
-                    y: target.rotation.y,
-                    z: target.rotation.z
-                  },
-                  Math.random() * duration + duration
-              )
-              .easing(TWEEN.Easing.Exponential.InOut)
-              .start();
-          tweens.push(tween)
-        }
-        tween = new TWEEN.Tween({x: 0})
-            .to({x: 1}, duration * 2)
-            .onUpdate(() => {
-              renderBus.emit()
-            })
-            .start();
-        tweens.push(tween)
-        animate()
-
-        function animate() {
-          if (Date.now() > ended_at) {
-            return;
-          }
-          requestAnimationFrame(animate)
-          tweens.map((t) => t.update())
-        }
+        const tweens = v ? getSphereTweens(cssObjects, duration) : getSurfaceTweens(cssObjects, duration)
+        animate(tweens, duration, () => renderBus.emit())
       })
-      nextTick(() => {
-        const ROTATE_LOOP = 1000
-        const ROTATE_TIME = 3000
-        scene.rotation.y = 0;
-        const tween = new TWEEN.Tween(scene.rotation);
-        tween.to(
-                {
-                  y: Math.PI * 6 * ROTATE_LOOP
-                },
-                ROTATE_TIME * ROTATE_LOOP
-            )
-            .onUpdate(() => renderBus.emit())
-            .repeat(Infinity)
-            .onStop(() => {
-              scene.rotation.y = 0;
-            })
-            .onComplete(() => {
-            })
-        animate()
-
-        function animate() {
-          requestAnimationFrame(animate)
-          if (tween.isPlaying()) {
-            tween.update()
-          }
+      const rotate = getRotate(scene, () => renderBus.emit())
+      rotateBus.on((v) => {
+        if (!props.entered || !v) {
+          rotate.stop()
+          shine.resume()
+          return
         }
-
-        rotateBus.on((v) => {
-          if (!props.entered || !v) {
-            tween.stop()
-            shine.resume()
-            return
-          }
-          shine.pause();
-          tween.start()
-        })
+        shine.pause();
+        rotate.start()
       })
-      const showLucky = (users: any[]) => {
-        const indexes = []
-        users.forEach(({id}) => {
-          const index = luckyIndexes.value[id]
-          if (typeof index === "number") {
-            indexes.push(index)
-          }
-        })
-        if (indexes.length !== users.length) {
-          setTimeout(() => showLucky(users), 500)
-          return;
-        }
-        // ElMessage.success(`恭喜${text.join("、")}获得${currentPrize.title}, 新的一年必定旺旺旺。`)
-        const duration = 600,
-            width = 140,
-            height = 87,
-            ySize = Math.ceil(indexes.length / 5),
-            xSize = indexes.length,
-            xStart = -(xSize - 1) / 2,
-            yStart = -(ySize - 1) / 2,
-            tweens: TWEEN.Tween[] = [];
-        for (let y = 0; y < ySize; y++) {
-          for (let x = 0; x < xSize; x++) {
-            const i = y*xSize + x
-            const object = cssObjects[indexes[i]];
-            tweens.push(new TWEEN.Tween(object.position)
-                .to(
-                    {
-                      x: (x + xStart) * width * Resolution,
-                      y: (y + yStart) * height * Resolution,
-                      z: 2200
-                    },
-                    Math.random() * duration + duration
-                )
-                .easing(TWEEN.Easing.Exponential.InOut)
-                .start());
-            tweens.push(new TWEEN.Tween(object.rotation)
-                .to(
-                    {
-                      x: 0,
-                      y: 0,
-                      z: 0
-                    },
-                    Math.random() * duration + duration
-                )
-                .easing(TWEEN.Easing.Exponential.InOut)
-                .start())
-          }
-        }
-        tweens.push(new TWEEN.Tween({})
-            .to({}, duration * 2)
-            .onUpdate(() => renderBus.emit())
-            .start())
-        const ended_at = Date.now() + duration * 2
-        function animate() {
-          if (Date.now() > ended_at) {
-            return;
-          }
-          requestAnimationFrame(animate)
-          tweens.map((t) => t.update())
-        }
-        animate()
-      }
-      luckyBus.on((users: any[]) => {
-        if (users.length <= 0) {
+
+      luckyBus.on((indexes: any[]) => {
+        if (indexes.length <= 0) {
           switchBus.emit([true, 300])
           return;
         }
@@ -300,7 +133,8 @@ if (!import.meta.env.SSR) {
         setTimeout(() => {
           rotateBus.emit(false)
         }, 1000)
-        showLucky(users)
+        const tweens = getLuckyTweens(cssObjects.filter((_, index) => indexes.includes(index)), 600)
+        animate(tweens, 600, () => renderBus.emit())
       })
       switchBus.emit([props.entered, 2000])
       useEventListener(window, 'resize', () => {
@@ -319,7 +153,7 @@ if (!import.meta.env.SSR) {
     switchBus.emit([props.entered, 2000])
   })
   watchEffect(() => {
-    luckyBus.emit(props.luckyUsers)
+    luckyBus.emit(currentLuckyIndexes.value)
   })
   watchEffect(() => {
     rotateBus.emit(props.drawing == 1)
@@ -330,7 +164,7 @@ if (!import.meta.env.SSR) {
 .container {
   z-index: 3;
   position: relative;
-  margin: 0 15vh;
+  margin: 0 10vh;
 }
 .none{
   display: none;
@@ -339,8 +173,8 @@ if (!import.meta.env.SSR) {
 <style>
 
 .element {
-  width: 12vh;
-  height: 16vh;
+  width: 120px;
+  height: 160px;
   box-shadow: 0 0 12px rgba(0, 255, 255, 0.5);
   border: 1px solid rgba(127, 255, 255, 0.25);
   text-align: center;
@@ -350,9 +184,9 @@ if (!import.meta.env.SSR) {
 }
 
 .element .avatar {
-  width: 60px;
+  width: 80px;
   margin: 0 auto;
-  border-radius: 30px 30px;
+  border-radius: 40px 40px;
   margin-top: 10px;
   margin-bottom: 5px;
 }
@@ -364,15 +198,15 @@ if (!import.meta.env.SSR) {
 
 .element .name {
   position: absolute;
-  top: 7vh;
+  top: 95px;
   left: 0;
   right: 0;
-  font-size: 2.2vh;
+  font-size: 25px;
   white-space: nowrap;
   overflow: hidden;
   font-weight: bold;
   color: rgba(255, 255, 255, 0.75);
-  text-shadow: 0 0 1vh rgba(0, 255, 255, 0.95);
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.95);
 }
 
 .element .details {

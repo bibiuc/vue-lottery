@@ -5,7 +5,6 @@ export const useMainMatrix = (isLuckyIndex: (item: any[], index: number) => bool
         matrix = ref<any[][]>([]),
         ROW_COUNT = 7,
         COLUMN_COUNT = 17,
-        TOTAL_CARDS = ROW_COUNT * COLUMN_COUNT,
         position = {
             x: (140 * COLUMN_COUNT - 20) / 2,
             y: (180 * ROW_COUNT - 20) / 2

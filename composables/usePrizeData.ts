@@ -23,48 +23,68 @@ export const usePrizeData = () => {
             ElMessage.error(message)
         }
     })
+    const actions = {
+        async syncPrizes(id: string) {
+            const res = await $fetch.get('/api/getPrizes', { params: { id } }).catch(() => []);
+            data.prizes = res as any[];
+        },
+        async syncPrize(id: string) {
+            const res = await $fetch.get('/api/getPrize', { params: { id } }).catch(() => []);
+            data.prize = res as any[];
+        },
+        async saveLuckyUsers(id: string) {
+            await $fetch.post('/api/saveLuckyUsers', { body: { id, prize_id: data.prize.id, user_ids: data.luckyUsers.map(({id}) => id) } }).catch(() => []);
+            data.luckyUsers = [];
+        },
+        async syncLeftUsers(id: string) {
+            const res = await $fetch.get('/api/getLeftUsers', { params: { id } }).catch(() => []);
+            data.leftUsers = res as any[];
+        },
+        async syncAllUsers(id: string) {
+            const res = await $fetch.get('/api/getAllUsers', { params: { id } }).catch(() => []);
+            data.allUsers = res as any[];
+        },
+        async lottery(id: string) {
+            try{
+                const res = await $fetch.get('/api/lottery', { params: { id } })
+                data.luckyUsers = res as any[];
+            } catch (e) {
+                data.luckyUsers = [];
+                throw e
+            }
+        },
+        async reset(id: string) {
+            await $fetch.get('/api/reset', { params: { id } }).catch(() => []);
+        },
+        download(id: string) {
+            const a = document.createElement('a')
+            a.href = '/api/download?id=' + id
+            a.download = '中奖人员.xlsx'
+            a.click()
+        }
+    }
+    const getters = {
+        user(i: number, users: any[]) {
+            if (!users || users.length < 0) {
+                return null
+            }
+            return users[i % users.length]
+        },
+        avatar(i: number, users: any[]): string {
+            let user = null
+            if (users && users.length > 0) {
+                user = users[i % users.length]
+            }
+            if (!user) {
+                return ''
+            }
+            return user.avatar.startsWith('http') ? (user.avatar as string) : ('http://sh.rbsoft.cn' + user.avatar)
+        }
+    }
 
     return {
         data,
-        actions: {
-            async syncPrizes(id: string) {
-                const res = await $fetch.get('/api/getPrizes', { params: { id } }).catch(() => []);
-                data.prizes = res as any[];
-            },
-            async syncPrize(id: string) {
-                const res = await $fetch.get('/api/getPrize', { params: { id } }).catch(() => []);
-                data.prize = res as any[];
-            },
-            async saveLuckyUsers(id: string) {
-                await $fetch.post('/api/saveLuckyUsers', { body: { id, prize_id: data.prize.id, user_ids: data.luckyUsers.map(({id}) => id) } }).catch(() => []);
-                data.luckyUsers = [];
-            },
-            async syncLeftUsers(id: string) {
-                const res = await $fetch.get('/api/getLeftUsers', { params: { id } }).catch(() => []);
-                data.leftUsers = res as any[];
-            },
-            async syncAllUsers(id: string) {
-                const res = await $fetch.get('/api/getAllUsers', { params: { id } }).catch(() => []);
-                data.allUsers = res as any[];
-            },
-            async lottery(id: string) {
-                try{
-                    const res = await $fetch.get('/api/lottery', { params: { id } })
-                    data.luckyUsers = res as any[];
-                } catch (e) {
-                    data.luckyUsers = [];
-                    throw e
-                }
-            },
-            async reset(id: string) {
-                await $fetch.get('/api/reset', { params: { id } }).catch(() => []);
-            },
-            download(id: string) {
-                const a = document.createElement('a')
-                a.href = '/api/download?id=' + id
-                a.download = '中奖人员.xlsx'
-                a.click()
-            }
-        }
+        actions,
+        getters
     }
 }

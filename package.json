@@ -26,5 +26,10 @@
     "three": "^0.171.0",
     "vue": "latest",
     "vue-router": "latest"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.13",
+    "@types/three": "^0.171.0",
+    "less": "^4.2.1"
   }
 }
