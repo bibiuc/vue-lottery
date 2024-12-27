@@ -29,7 +29,6 @@ export const useLuckyIndexes = (luckyIds: Ref<(number|string)[]>, getCurrentLuck
                 ids.push(index)
             }
         })
-        console.log(ids)
         if (ids.length !== users.length) {
             return [];
         }

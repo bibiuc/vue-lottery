@@ -24,7 +24,6 @@ const select = async (wheres: BinaryOperator[]) => {
 
 export const getPrizes = async (id: string) => {
     const prizes = await db.select().from(ActivityPrizeTable).where(eq(ActivityPrizeTable.activity_id, id));
-    console.log(prizes)
     const luckyUsers = await getLuckyUsers(id);
     return prizes.map((prize) => {
         return {
