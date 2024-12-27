@@ -211,11 +211,12 @@ if (!import.meta.env.SSR) {
 
 .element .details {
   position: absolute;
-  bottom: 1.2vh;
+  bottom: 10px;
   left: 0;
   right: 0;
-  font-size: 1.6vh;
+  font-size: 18px;
   color: rgba(127, 255, 255, 0.75);
+  text-align: center;
 }
 
 .highlight {

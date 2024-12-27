@@ -14,6 +14,9 @@
         <button class="lottery" v-if="drawing == 2" @click="saveLuckyUsers()">确认结果</button>
         <button class="reLottery" v-if="drawing == 2" @click="reLottery()" >重新抽奖</button>
         <div class="fixed-bar">
+          <img class="qrcode" src="https://sh.rbsoft.cn/assets/img/gift.jpg" alt=""/>
+          <div class="qrcode-text">二维码</div>
+          <button @click="toggle">全屏</button>
           <button class="save fixed-btn" @click.stop.prevent="downloadResult">导出抽奖结果</button>
           <button class="reset fixed-btn" @click="resetAll">重置</button>
         </div>
@@ -33,6 +36,7 @@ const reload = () => {
   actions.syncPrize(id);
   actions.syncAllUsers(id);
 }
+const { toggle } = useFullscreen()
 const lottery = async () => {
   if (drawing.value != 1) {
     return;
@@ -104,6 +108,18 @@ reload();
       padding: 12px 0;
       display: block;
       width: 100%;
+    }
+    .qrcode{
+      display: block;
+      outline: 1px solid rgba(127, 255, 255, 0.75);
+      width: 180px;
+      margin:10px auto;
+    }
+    .qrcode-text{
+      color: rgba(127, 255, 255, 0.75);
+      background: transparent;
+      font-size: 27px;
+      margin-bottom:50px;
     }
   }
 }
