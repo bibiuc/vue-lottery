@@ -1,5 +1,5 @@
 import { getLeftUsers, getPrize } from '../lib/db'
-import { random } from 'lodash'
+import random from 'lodash-es/random'
 import { H3Error } from "h3";
 
 export default eventHandler(async (req) => {
