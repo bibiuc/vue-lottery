@@ -11,7 +11,7 @@ const select = async (wheres: BinaryOperator[]) => {
     if (!result) {
         return []
     }
-    const ids = [];
+    const ids: number[] = [];
     return result.map(({fa_wdsxh_activity_apply, fa_wdsxh_user_wechat}) => {
         return {
             id: fa_wdsxh_activity_apply.wechat_id,
