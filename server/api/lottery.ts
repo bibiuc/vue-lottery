@@ -1,5 +1,6 @@
 import { getLeftUsers, getPrize } from '../lib/db'
-import {H3Error} from "h3";
+import { random } from 'lodash'
+import { H3Error } from "h3";
 
 export default eventHandler(async (req) => {
     const query = getQuery(req)
@@ -8,7 +9,7 @@ export default eventHandler(async (req) => {
     if (!leftUsers || leftUsers.length === 0){
         throw new H3Error('暂无可抽奖的用户。');
     }
-    leftUsers.sort(() => Math.random() - 0.5)
+    leftUsers.sort(() => random(0, 1) - 0.5)
     const luckyUsers = [];
     const max = Math.min(prize.left, prize.once, leftUsers.length);
     for (let i = 0; i < max; i++) {
