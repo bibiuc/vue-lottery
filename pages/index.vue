@@ -3,7 +3,7 @@
     <StarBackground />
     <MusicBox/>
     <ClientOnly>
-      <MainContainer :users="data.allUsers" :drawing="drawing" :entered="entered" :luckyUsers="data.luckyUsers"/>
+      <MainContainer :users="data.allUsers" :drawing="drawing" :entered="entered" :luckyUsers="data.luckyUsers" @sync="actions.syncAllUsers()"/>
     </ClientOnly>
     <PrizeList :prizes="data.prizes" :current="data.prize.id"/>
 
