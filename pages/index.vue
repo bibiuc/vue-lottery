@@ -14,7 +14,7 @@
         <button class="lottery" v-if="drawing == 2" @click="saveLuckyUsers()">确认结果</button>
         <button class="reLottery" v-if="drawing == 2" @click="reLottery()" >重新抽奖</button>
         <div class="fixed-bar">
-          <div class="qrcode-text">共计 <span style="color: darkred;">{{data.allUsers.length}｝</span>人参与抽奖人</div>
+          <div class="qrcode-text">共计 <span style="color: darkred;">{{data.allUsers.length}}</span>人参与抽奖人</div>
           <img class="qrcode" src="https://sh.rbsoft.cn/assets/img/build.png" alt=""/>
           <div class="qrcode-text">二维码</div>
           <button @click="toggle">全屏</button>
