@@ -24,6 +24,7 @@ import {use3DSurfaces} from "~/composables/use3DSurfaces";
 import {useLuckyTweens} from "~/composables/useLuckyTween";
 
 const {getters} = usePrizeData();
+const emit = defineEmits(['sync']);
 const props = defineProps({
   luckyUsers: {
     type: Array,
@@ -63,7 +64,6 @@ const { matrix, shine } = useMainMatrix(([y, x, i], index) => {
   return isLuckyIndex(user.id, index)
 });
 const {animate, getRotate} = useTweens();
-const Resolution = 1;
 const renderBus = useEventBus<string>('render')
 const switchBus = useEventBus<[boolean, number]>('switch')
 const luckyBus = useEventBus<any[]>('lucky')
@@ -71,6 +71,9 @@ const rotateBus = useEventBus<boolean>('rotate')
 const getSurfaceTweens = use3DSurfaces(matrix.value)
 const getSphereTweens = use3DSpheres(matrix.value)
 const getLuckyTweens = useLuckyTweens()
+const sync = useInterval(() => {
+  emit('sync')
+}, 3000);
 
 if (!import.meta.env.SSR) {
   onMounted(() => {
@@ -117,11 +120,13 @@ if (!import.meta.env.SSR) {
       rotateBus.on((v) => {
         if (!props.entered || !v) {
           rotate.stop()
+          sync.start();
           shine.resume()
           return
         }
         shine.pause();
-        rotate.start()
+        sync.stop();
+        rotate.start();
       })
 
       luckyBus.on((indexes: any[]) => {
