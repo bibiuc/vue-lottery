@@ -10,10 +10,10 @@
     </div>
     <ul class="prize-list">
       <template v-for="(prize, i) in prizes">
-      <li  v-if="prize && prize.status >= 1" :key="i" :class="{shine: prize === currentPrize}" class="prize-item" >
+      <li  v-if="prize" :key="i" :class="{shine: prize === currentPrize}" class="prize-item" >
       <span></span><span></span><span></span><span></span>
       <div class="prize-img">
-        <img :alt="prize.title" :src="'http://sh.rbsoft.cn' + prize.image">
+        <img :alt="prize.title" :src="prize.image">
       </div>
       <div class="prize-text">
         <h5 class="prize-title">

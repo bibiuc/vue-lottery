@@ -13,7 +13,7 @@ export const UserTable = sqliteTable('user', {
     id: integer('id').primaryKey(),
     nickname: text('nickname', {length: 50}).notNull(),
     mobile: text('mobile', {length: 11}).notNull(),
-    avatar: text('avatar', {length: 255}).notNull().unique(),
+    avatar: text('avatar', {length: 255}).notNull(),
 });
 
 export const ActivityUserTable = sqliteTable('activity_user', {
@@ -28,8 +28,8 @@ export const ActivityPrizeTable = sqliteTable('prize', {
     activity_id: integer('activity_id').notNull(),
     sort: integer('sort').notNull().default(0),
     name: text('name', {length: 255}).notNull(),
-    image: text('image', {length: 255}).notNull().unique(),
-    description: text('description', {length: 255}).notNull().unique(),
+    image: text('image', {length: 255}).notNull(),
+    description: text('description', {length: 255}).notNull(),
     once: integer('once').notNull().default(0),
     max: integer('max').notNull().default(0),
 });

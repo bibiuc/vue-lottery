@@ -10,12 +10,16 @@ import Nzh from 'nzh';
 function avatarBase64() {
     const data = Mock.Random.guid();
     const identicon = new Identicon(data, {size:128, format: 'svg'});
-    return identicon.image().getBase64();
+    return 'data:image/svg+xml;base64,' + identicon.image().getBase64();
 }
 
 // 扩展Mock.js的随机数据生成规则
 Mock.Random.extend({
-    avatarBase64
+    avatarBase64,
+    phone: function () {
+        const phonePrefixs = `156.158.189.170.139.136`.split('.') // 自己写前缀哈
+        return Mock.Random.pick(phonePrefixs) + Mock.mock(/\d{8}/) //Number()
+    }
 });
 
 const lockfile = path.join(path.resolve('./server/db/installed'));
@@ -54,6 +58,8 @@ const init = async (db: LibSQLDatabase) => {
             ...prize,
             activity_id: 1,
             sort: i,
+            max: i + 1,
+            once: 1,
             name: (i ? Nzh.cn.encodeS(i): '特') + '等奖'
         }).returning();
     }))

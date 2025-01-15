@@ -5,7 +5,7 @@
     <ClientOnly>
       <MainContainer :users="data.allUsers" :drawing="drawing" :entered="entered" :luckyUsers="data.luckyUsers" @sync="actions.syncAllUsers(id)"/>
     </ClientOnly>
-    <PrizeList :prizes="data.prizes" :current="data.prize.id"/>
+    <PrizeList :prizes="data.prizes" :current="data.prize?.id"/>
 
     <div class="menu">
       <div class="lotteryBar" v-if="entered">

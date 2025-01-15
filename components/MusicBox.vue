@@ -4,10 +4,10 @@
     <div class="music-box" title="播放/暂停背景音乐" @click="toggle" >Music</div>
   </div>
 </template>
-<script setup>
+<script lang="ts" setup>
 import mp3 from '@/assets/music.mp3'
-const musicRef = ref<HTMLAudioElement|None>(null)
-const animating = ref(false)
+const musicRef = ref<HTMLAudioElement>(undefined)
+const animating = ref(true)
 const toggle = () => {
   if (musicRef.value) {
     const music = musicRef.value

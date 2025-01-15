@@ -15,10 +15,8 @@
 </template>
 <script setup lang="ts">
 import * as THREE from 'three'
-import * as TWEEN from '@tweenjs/tween.js'
-import {isEqual} from 'lodash'
 import {CSS3DObject, CSS3DRenderer} from 'three/examples/jsm/Addons'
-import {TrackballControls} from 'three/examples/jsm/controls/TrackballControls.js'
+import {TrackballControls} from 'three/examples/jsm/Addons'
 import {useLuckyIndexes} from "~/composables/useLuckyIndexes";
 import {use3DSurfaces} from "~/composables/use3DSurfaces";
 import {useLuckyTweens} from "~/composables/useLuckyTween";
@@ -71,9 +69,10 @@ const rotateBus = useEventBus<boolean>('rotate')
 const getSurfaceTweens = use3DSurfaces(matrix.value)
 const getSphereTweens = use3DSpheres(matrix.value)
 const getLuckyTweens = useLuckyTweens()
-const sync = useInterval(() => {
+const sync = useIntervalFn(() => {
   emit('sync')
 }, 3000);
+console.log(sync)
 
 if (!import.meta.env.SSR) {
   onMounted(() => {
@@ -120,12 +119,12 @@ if (!import.meta.env.SSR) {
       rotateBus.on((v) => {
         if (!props.entered || !v) {
           rotate.stop()
-          sync.start();
+          sync.resume();
           shine.resume()
           return
         }
         shine.pause();
-        sync.stop();
+        sync.pause();
         rotate.start();
       })
 
