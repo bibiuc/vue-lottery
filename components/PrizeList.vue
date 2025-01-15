@@ -42,13 +42,13 @@ const props = defineProps({
     required: true
   },
   current: {
-    type: [String, Number],
-    default: ''
+    type: Number,
+    default: 0
   }
 })
 const currentPrize = computed(() => {
   let i = 0, prize;
-  if (typeof props.current !== '') {
+  if (typeof props.current !== 0) {
     for (; i < props.prizes.length; i++) {
       prize = props.prizes[i]
       if (prize.id === props.current) {

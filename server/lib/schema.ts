@@ -1,32 +1,36 @@
-import {mysqlTable, int, tinyint, varchar, mysqlEnum, decimal, datetime} from 'drizzle-orm/mysql-core';
-export const MemberTable = mysqlTable('fa_wdsxh_user_wechat', {
-    id: int('id').primaryKey(),
-    nickname: varchar('nickname', {length: 50}).notNull(),
-    mobile: varchar('mobile', {length: 11}).notNull(),
-    avatar: varchar('avatar', {length: 255}).notNull().unique(),
+import {sqliteTable, integer, text} from 'drizzle-orm/sqlite-core';
+
+
+
+export const ActivityTable = sqliteTable('activity', {
+    id: integer('id').primaryKey(),
+    name: text('name', {length: 50}).notNull(),
+    main_bg: text('main_bg', {length: 255}).notNull(),
+    lottery_bg: text('lottery_bg', {length: 255}).notNull(),
 });
 
-export const ActivityUserTable = mysqlTable('fa_wdsxh_activity_apply', {
-    id: int('id').primaryKey(),
-    wechat_id: int('wechat_id').notNull(),
-    activity_id: int('activity_id').notNull(),
-    state: mysqlEnum(['1','2','3','4','5']),
-    is_sign_in: mysqlEnum(['1','2','3']),
-    type: tinyint().notNull(),
-    prize_id: int().notNull().default(0)
+export const UserTable = sqliteTable('user', {
+    id: integer('id').primaryKey(),
+    nickname: text('nickname', {length: 50}).notNull(),
+    mobile: text('mobile', {length: 11}).notNull(),
+    avatar: text('avatar', {length: 255}).notNull().unique(),
 });
 
-export const ActivityPrizeTable = mysqlTable('fa_wdsxh_activity_prize', {
-    id: int('id').primaryKey(),
-    activity_id: int('activity_id').notNull(),
-    sort: int('sort').notNull().default(0),
-    name: varchar('name', {length: 255}).notNull(),
-    image: varchar('image', {length: 255}).notNull().unique(),
-    description: varchar('description', {length: 255}).notNull().unique(),
-    price: decimal('price').notNull(),
-    once: int('once').notNull().default(0),
-    status: int('status').notNull().default(1),
-    max: int('max').notNull().default(0),
-    created_at: datetime('created_at')
+export const ActivityUserTable = sqliteTable('activity_user', {
+    id: integer('id').primaryKey(),
+    user_id: integer('user_id').notNull(),
+    activity_id: integer('activity_id').notNull(),
+    prize_id: integer().notNull().default(0)
+});
+
+export const ActivityPrizeTable = sqliteTable('prize', {
+    id: integer('id').primaryKey(),
+    activity_id: integer('activity_id').notNull(),
+    sort: integer('sort').notNull().default(0),
+    name: text('name', {length: 255}).notNull(),
+    image: text('image', {length: 255}).notNull().unique(),
+    description: text('description', {length: 255}).notNull().unique(),
+    once: integer('once').notNull().default(0),
+    max: integer('max').notNull().default(0),
 });
 

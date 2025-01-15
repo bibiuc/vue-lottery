@@ -4,8 +4,8 @@ import { H3Error } from "h3";
 
 export default eventHandler(async (req) => {
     const query = getQuery(req)
-    const prize = await getPrize(query.id as string);
-    const leftUsers = await getLeftUsers(query.id as string)
+    const prize = await getPrize(query.id as number);
+    const leftUsers = await getLeftUsers(query.id as number)
     if (!leftUsers || leftUsers.length === 0){
         throw new H3Error('暂无可抽奖的用户。');
     }

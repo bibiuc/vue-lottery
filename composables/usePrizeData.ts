@@ -24,27 +24,27 @@ export const usePrizeData = () => {
         }
     })
     const actions = {
-        async syncPrizes(id: string) {
+        async syncPrizes(id: number) {
             const res = await $fetch.get('/api/getPrizes', { params: { id } }).catch(() => []);
             data.prizes = res as any[];
         },
-        async syncPrize(id: string) {
+        async syncPrize(id: number) {
             const res = await $fetch.get('/api/getPrize', { params: { id } }).catch(() => []);
             data.prize = res as any[];
         },
-        async saveLuckyUsers(id: string) {
+        async saveLuckyUsers(id: number) {
             await $fetch.post('/api/saveLuckyUsers', { body: { id, prize_id: data.prize.id, user_ids: data.luckyUsers.map(({id}) => id) } }).catch(() => []);
             data.luckyUsers = [];
         },
-        async syncLeftUsers(id: string) {
+        async syncLeftUsers(id: number) {
             const res = await $fetch.get('/api/getLeftUsers', { params: { id } }).catch(() => []);
             data.leftUsers = res as any[];
         },
-        async syncAllUsers(id: string) {
+        async syncAllUsers(id: number) {
             const res = await $fetch.get('/api/getAllUsers', { params: { id } }).catch(() => []);
             data.allUsers = res as any[];
         },
-        async lottery(id: string) {
+        async lottery(id: number) {
             try{
                 const res = await $fetch.get('/api/lottery', { params: { id } })
                 data.luckyUsers = res as any[];
@@ -53,10 +53,10 @@ export const usePrizeData = () => {
                 throw e
             }
         },
-        async reset(id: string) {
+        async reset(id: number) {
             await $fetch.get('/api/reset', { params: { id } }).catch(() => []);
         },
-        download(id: string) {
+        download(id: number) {
             const a = document.createElement('a')
             a.href = '/api/download?id=' + id
             a.download = '中奖人员.xlsx'
@@ -78,7 +78,7 @@ export const usePrizeData = () => {
             if (!user) {
                 return ''
             }
-            return user.avatar.startsWith('http') ? (user.avatar as string) : ('http://sh.rbsoft.cn' + user.avatar)
+            return user.avatar
         }
     }
 

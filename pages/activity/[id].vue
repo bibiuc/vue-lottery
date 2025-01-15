@@ -2,22 +2,19 @@
   <div>
     <el-image :src="background" class="ui-fullscreen" fit="cover"></el-image>
     <div class="ui-bottom-buttons">
-      <el-button type="primary" class="ui-shadow" @click="router.push('/active/0')">抽奖活动</el-button>
-      <el-button type="primary" class="ui-shadow">节目投票</el-button>
-      <el-button type="primary" class="ui-shadow">排行榜</el-button>
+      <el-button type="primary" class="ui-shadow" @click="router.push(`/activity/${id}/lottery`)">抽奖活动</el-button>
       <el-button type="primary" class="ui-shadow" @click="showQrCodeModal = true">签到二维码</el-button>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import ImageWeb from '@/assets/images/web.jpg';
-import ImageH5 from '@/assets/images/h5.jpg';
-
 const router = useRouter();
-const background = process.client && (screen.width < screen.height) ? ImageH5 : ImageWeb;
+const { params } = useRoute();
+const id = params ? (params.id ||1) : 1
+const background = '';
 const { show: showQrCodeModal } = useQrCodeModal();
 </script>
-<style scope>
+<style scoped>
 .ui-fullscreen{
   position: fixed;
   top: 0;

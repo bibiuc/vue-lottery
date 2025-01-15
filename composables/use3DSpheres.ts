@@ -1,4 +1,4 @@
-import type {CSS3DObject} from "three/examples/jsm/renderers/CSS3DRenderer";
+import type {CSS3DObject} from "three/addons"; //
 import * as TWEEN from "@tweenjs/tween.js";
 import * as THREE from "three";
 import {useResolution} from "~/composables/useResolution";

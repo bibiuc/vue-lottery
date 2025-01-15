@@ -17,7 +17,7 @@
 import * as THREE from 'three'
 import * as TWEEN from '@tweenjs/tween.js'
 import {isEqual} from 'lodash'
-import {CSS3DObject, CSS3DRenderer} from 'three/examples/jsm/renderers/CSS3DRenderer'
+import {CSS3DObject, CSS3DRenderer} from 'three/examples/jsm/Addons'
 import {TrackballControls} from 'three/examples/jsm/controls/TrackballControls.js'
 import {useLuckyIndexes} from "~/composables/useLuckyIndexes";
 import {use3DSurfaces} from "~/composables/use3DSurfaces";

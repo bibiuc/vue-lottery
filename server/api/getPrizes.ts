@@ -1,5 +1,5 @@
 import { getPrizes } from '../lib/db'
 export default eventHandler(async (req) => {
     const query = getQuery(req)
-    return await getPrizes(query.id as string)
+    return await getPrizes(query.id as number)
 });

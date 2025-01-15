@@ -6,7 +6,7 @@
 </template>
 <script setup>
 import mp3 from '@/assets/music.mp3'
-const musicRef = ref(null)
+const musicRef = ref<HTMLAudioElement|None>(null)
 const animating = ref(false)
 const toggle = () => {
   if (musicRef.value) {

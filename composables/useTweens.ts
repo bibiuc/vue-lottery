@@ -30,7 +30,11 @@ export const useTweens = () => {
             },
             ROTATE_TIME * ROTATE_LOOP
         )
-            .onUpdate(render)
+            .onUpdate(() => {
+                if (render) {
+                    render()
+                }
+            })
             .repeat(Infinity)
             .onStop(() => {
                 scene.rotation.y = 0;

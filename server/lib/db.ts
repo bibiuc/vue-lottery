@@ -1,24 +1,27 @@
 import 'dotenv/config';
-import { drizzle } from "drizzle-orm/mysql2";
-import {ActivityPrizeTable, ActivityUserTable, MemberTable} from './schema'
+import { drizzle } from "drizzle-orm/libsql";
+import {ActivityPrizeTable, ActivityUserTable, UserTable} from './schema'
 import {and, eq, gt, inArray} from "drizzle-orm";
-import type {BinaryOperator} from "drizzle-orm/sql/expressions/conditions";
+import init from './init';
+import {SQL} from "drizzle-orm/sql/sql";
 
-export const db = drizzle({ connection: { uri: process.env.DATABASE_URL as string }, logger: true});
-const select = async (wheres: BinaryOperator[]) => {
-    const query = db.select().from(ActivityUserTable).leftJoin(MemberTable, eq(ActivityUserTable.wechat_id, MemberTable.id));
-    const result = await query.where(and(...wheres))
+export const db = drizzle({ connection: process.env.DATABASE_URL as string, logger: true});
+
+init(db).catch(console.log)
+const select = async (wheres: SQL): Promise<{id: number, nickname: string, mobile: string, prize_id: number}[]> => {
+    const query = db.select().from(ActivityUserTable).leftJoin(UserTable, eq(ActivityUserTable.user_id, UserTable.id));
+    const result = await query.where(wheres)
     if (!result) {
         return []
     }
     const ids: number[] = [];
-    return result.map(({fa_wdsxh_activity_apply, fa_wdsxh_user_wechat}) => {
+    return result.map(({activity_user, user}) => {
         return {
-            id: fa_wdsxh_activity_apply.wechat_id,
-            nickname: fa_wdsxh_user_wechat.nickname,
-            mobile: fa_wdsxh_user_wechat.mobile,
-            avatar: fa_wdsxh_user_wechat.avatar,
-            prize_id: fa_wdsxh_activity_apply.prize_id
+            id: activity_user.user_id,
+            nickname: user!.nickname,
+            mobile: user!.mobile,
+            avatar: user!.avatar,
+            prize_id: activity_user.prize_id
         }
     }).filter(({id}) => {
         const has = ids.includes(id)
@@ -30,7 +33,7 @@ const select = async (wheres: BinaryOperator[]) => {
     })
 }
 
-export const getPrizes = async (id: string) => {
+export const getPrizes = async (id: number) => {
     const prizes = await db.select().from(ActivityPrizeTable).where(eq(ActivityPrizeTable.activity_id, id));
     const luckyUsers = await getLuckyUsers(id);
     return prizes.map((prize) => {
@@ -41,7 +44,7 @@ export const getPrizes = async (id: string) => {
     })
 }
 
-export const getPrize = async (id: string) => {
+export const getPrize = async (id: number) => {
     const prizes = await getPrizes(id)
     let i = 0, prize = prizes[0];
     for (; i < prizes.length; i++) {
@@ -56,22 +59,36 @@ export const getPrize = async (id: string) => {
     return prize
 }
 
-export const getLeftUsers = (id: string) => {
-    return select([eq(ActivityUserTable.activity_id, id), eq(ActivityUserTable.prize_id, 0), eq(ActivityUserTable.is_sign_in, '1')]);
+export const getLeftUsers = (id: number) => {
+    return select(
+        and(
+            eq(ActivityUserTable.activity_id, id),
+            eq(ActivityUserTable.prize_id, 0)
+        )!
+    );
 }
 
-export const getAllUsers = (id: string) => {
-    return select([eq(ActivityUserTable.activity_id, id), eq(ActivityUserTable.is_sign_in, '1')]);
+export const getAllUsers = (id: number) => {
+    return select(eq(ActivityUserTable.activity_id, id));
 }
 
-export const getLuckyUsers = (id: string) => {
-    return select([eq(ActivityUserTable.activity_id, id), gt(ActivityUserTable.prize_id, 0), eq(ActivityUserTable.is_sign_in, '1')]);
+export const getLuckyUsers = (id: number) => {
+    return select(
+        and(
+            eq(ActivityUserTable.activity_id, id),
+            gt(ActivityUserTable.prize_id, 0)
+        )!
+    );
 }
 
-export const reset = (id: string) => {
+export const reset = (id: number) => {
     return db.update(ActivityUserTable).set({prize_id: 0}).where(eq(ActivityUserTable.activity_id, id));
 }
 
 export const setUserPrize = (id: number, user_ids: number[], prize_id: number) => {
-    return db.update(ActivityUserTable).set({prize_id}).where(eq(ActivityUserTable.activity_id, id)).where(inArray(ActivityUserTable.wechat_id, user_ids));
+    return db.update(ActivityUserTable).set({prize_id})
+        .where(and(
+            eq(ActivityUserTable.activity_id, id),
+            inArray(ActivityUserTable.user_id, user_ids)
+        ));
 }

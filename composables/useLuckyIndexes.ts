@@ -1,4 +1,4 @@
-import {isEqual} from "lodash";
+import {isEqual, isNumber} from "lodash";
 
 export const useLuckyIndexes = (luckyIds: Ref<(number|string)[]>, getCurrentLuckyUsers: () =>any[]) => {
     const indexes = ref<Record<string, number>>({});
@@ -12,7 +12,7 @@ export const useLuckyIndexes = (luckyIds: Ref<(number|string)[]>, getCurrentLuck
     const isInIndexes = (id: number|string, index: number) => {
         const savedIndex = indexes.value[id]
         if (luckyIds.value.includes(id)) {
-            if (typeof savedIndex === 'number') {
+            if (isNumber(savedIndex)) {
                 return savedIndex == index
             }
             addLuckyIndex(id, index)
