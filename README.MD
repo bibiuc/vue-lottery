@@ -1,11 +1,11 @@
-# Nuxt Minimal Starter
+# Lottery 用nuxt重写
+原版地址: [https://github.com/moshang-ax/lottery](https://github.com/moshang-ax/lottery)
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## 预览地址 [https://lottery.demo.kiduc.com/](https://lottery.demo.kiduc.com/)
 
-## Setup
+## 安装
 
-Make sure to install dependencies:
-
+### 安装依赖
 ```bash
 # npm
 npm install
@@ -19,11 +19,19 @@ yarn install
 # bun
 bun install
 ```
+### 初始化数据库
+```bash
+# 生成比对文件
+npx drizzle-kit generate
+# 合并数据库
+npx drizzle-kit migrate
 
-## Development Server
+```
+## 服务地址
 
-Start the development server on `http://localhost:3000`:
+服务地址是 `http://localhost:18000`:
 
+### 执行
 ```bash
 # npm
 npm run dev
@@ -38,7 +46,7 @@ yarn dev
 bun run dev
 ```
 
-## Production
+## 打包
 
 Build the application for production:
 
@@ -56,7 +64,7 @@ yarn build
 bun run build
 ```
 
-Locally preview production build:
+## 开始
 
 ```bash
 # npm
@@ -71,5 +79,3 @@ yarn preview
 # bun
 bun run preview
 ```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
